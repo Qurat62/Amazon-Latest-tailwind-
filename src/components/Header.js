@@ -5,7 +5,17 @@ import {
   SearchIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/outline";
+import {signIn,signOut,useSession} from "next-auth/client";
+import {useRouter} from "next/router";
+import {useSelector} from "react-redux";
+import {selectItems} from "../slices/basketSlice";
+
+
 function Header() {
+  const [session]=useSession();
+  const router=useRouter();
+  //selector grabs infor from the redux store, in this caase from basketSlice
+  const items=useSelector(selectItems);
   return (
     <header>
       {/* Top Nav */}
@@ -17,8 +27,10 @@ function Header() {
             height={40}
             objectFit="contain"
             className="cursor-pointer"
+            onClick={()=>router.push('/')}
           />
         </div>
+        {/* //different pages get stacked up on top of each other when ever user move backand forth between pages it removes the prev page and move to next */}
         {/* search */}
         <div className="hidden sm:flex  items-center rounded-md flex-grow cursor-pointer bg-yellow-400 hover:bg-yellow-500">
           <input
@@ -29,8 +41,8 @@ function Header() {
         </div>
         {/* Right */}
         <div className="text-white flex items-center text-xs space-x-6 mx-6">
-          <div className="link">
-            <p>hello Qurat</p>
+          <div onClick={!session? signIn:signOut} className="cursor-pointer link">
+            {session? `hello, ${session.user.name}`: 'Sign In'}  
             <p className="font-extrabold md:text-sm">Account & Lists</p>
           </div>
           <div className="link">
@@ -38,9 +50,9 @@ function Header() {
             <p className="font-extrabold md:text-sm">& Orders</p>
           </div>
 
-          <div className="relative link flex items-center">
+          <div onClick={()=> router.push('/Checkout')} className="relative link flex items-center">
             <span className="absolute top-0 right-0 md-right h-4 w-4 bg-yellow-400 text-center rounded-full text-black  font-bold">
-              4
+              {items.length}
             </span>
             <ShoppingCartIcon className="h-10" />
             <p className="hidden md:inline font-extrabold md:text-sm mt-2">
